@@ -15,8 +15,6 @@ CONFIG_PATH = os.path.expanduser("~/.managecor_config.yaml")
 
 
 def load_config():
-    if not os.path.exists(CONFIG_PATH):
-        update_config()
     with open(CONFIG_PATH, "r") as f:
         return yaml.safe_load(f)
 
@@ -24,6 +22,7 @@ def load_config():
 @app.command()
 def init():
     """Initialize the managecor environment."""
+    update_config()
     config = load_config()
     ensure_docker_image(config["docker_image"])
     create_aliases(config["aliases"])
@@ -51,18 +50,34 @@ def run(command: List[str] = typer.Argument(...)):
 
 
 def create_aliases(aliases):
-    """Create aliases for common commands."""
+    """Create aliases for common commands, avoiding duplications."""
     shell = os.environ.get("SHELL", "").split("/")[-1]
     rc_file = f"~/.{shell}rc"
+    rc_path = os.path.expanduser(rc_file)
 
-    with open(os.path.expanduser(rc_file), "a") as f:
-        for alias, command in aliases.items():
-            alias_command = f'alias {alias}="managecor run -- {command}"\n'
-            f.write(alias_command)
+    # Lire le contenu actuel du fichier
+    try:
+        with open(rc_path, "r") as f:
+            current_content = f.read()
+    except FileNotFoundError:
+        current_content = ""
 
-    typer.echo(
-        f"Aliases added to {rc_file}. Please restart your shell or run 'source {rc_file}' to apply changes."
-    )
+    # Préparer les nouvelles lignes d'alias
+    new_aliases = []
+    for alias, command in aliases.items():
+        alias_command = f'alias {alias}="managecor run -- {command}"\n'
+        if alias_command not in current_content:
+            new_aliases.append(alias_command)
+
+    # Ajouter uniquement les nouveaux alias
+    if new_aliases:
+        with open(rc_path, "a") as f:
+            f.writelines(new_aliases)
+        typer.echo(f"Added {len(new_aliases)} new aliases to {rc_file}.")
+    else:
+        typer.echo("No new aliases to add.")
+
+    typer.echo(f"Please restart your shell or run 'source {rc_file}' to apply changes.")
 
 
 if __name__ == "__main__":
