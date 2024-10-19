@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "managecor"
+version = "0.1.0"
+description = ""
+authors = ["infocornouaille <90894019+infocornouaille@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typer = "^0.12.5"
+docker = "^7.1.0"
+pyyaml = "^6.0.2"
+requests = "^2.32.3"
+
+[tool.poetry.scripts]
+managecor = "managecor.cli:app"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

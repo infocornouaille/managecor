@@ -1,0 +1,6 @@
+aliases:
+  pythoncor: python
+  xelatexcor: xelatex
+  pandoccor: pandoc
+
+docker_image: infocornouaille/tools:perso
