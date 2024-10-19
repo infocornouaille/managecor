@@ -2,5 +2,11 @@ aliases:
   pythoncor: python
   xelatexcor: xelatex
   pandoccor: pandoc
+  latexcor: latexcor
+  latextomd: latextomd
+  pdfcor: pdfcor
+  jupytercor: jupytercor
+  black: black
+  magick: magick
 
 docker_image: infocornouaille/tools:perso
