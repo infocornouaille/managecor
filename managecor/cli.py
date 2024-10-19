@@ -38,6 +38,8 @@ def update_config():
         with open(CONFIG_PATH, "w") as f:
             f.write(response.text)
         typer.echo("Configuration updated successfully!")
+        config = load_config()
+        create_aliases(config["aliases"])
     except requests.RequestException as e:
         typer.echo(f"Failed to update configuration: {e}")
 
