@@ -1,7 +1,8 @@
+import os
+import subprocess
+
 import docker
 import typer
-import subprocess
-import os
 
 
 def ensure_docker_image(image_name: str):
