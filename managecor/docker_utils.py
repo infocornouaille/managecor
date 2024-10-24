@@ -5,13 +5,13 @@ from typing import List
 import docker
 from rich.console import Console
 from rich.progress import (
+    BarColumn,
+    DownloadColumn,
     Progress,
     SpinnerColumn,
     TextColumn,
-    BarColumn,
-    DownloadColumn,
-    TransferSpeedColumn,
     TimeRemainingColumn,
+    TransferSpeedColumn,
 )
 from rich.theme import Theme
 
