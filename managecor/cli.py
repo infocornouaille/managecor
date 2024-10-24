@@ -10,24 +10,36 @@ import typer
 import yaml
 from rich.console import Console
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
+from rich.progress import (
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    DownloadColumn,
+    TransferSpeedColumn,
+    TimeRemainingColumn,
+)
 from rich.theme import Theme
 from rich import print as rprint
 
 from .docker_utils import run_docker_command
 
 app = typer.Typer()
-console = Console(theme=Theme({
-    "success": "green bold",
-    "error": "red bold",
-    "warning": "yellow bold",
-    "info": "blue bold"
-}))
+console = Console(
+    theme=Theme(
+        {
+            "success": "green bold",
+            "error": "red bold",
+            "warning": "yellow bold",
+            "info": "blue bold",
+        }
+    )
+)
 
 CONFIG_URL = (
     "https://raw.githubusercontent.com/infocornouaille/managecor/main/config.yaml"
 )
 CONFIG_PATH = os.path.expanduser("~/.managecor_config.yaml")
+
 
 def is_admin():
     """Check if the script is running with administrative privileges."""
@@ -36,33 +48,36 @@ def is_admin():
     except:
         return False
 
+
 def run_as_admin():
     """Restart the script with administrative privileges."""
     ctypes.windll.shell32.ShellExecuteW(
         None, "runas", sys.executable, " ".join(sys.argv), None, 1
     )
 
+
 def load_config():
     try:
         with open(CONFIG_PATH, "r") as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
-        console.print("[error]Configuration file not found. Run 'managecor init' first.[/error]")
+        console.print(
+            "[error]Configuration file not found. Run 'managecor init' first.[/error]"
+        )
         raise typer.Exit(1)
     except yaml.YAMLError:
         console.print("[error]Invalid configuration file format.[/error]")
         raise typer.Exit(1)
+
 
 def ensure_docker_image(image_name: str):
     """Ensure Docker image exists, downloading it if necessary with progress bar."""
     try:
         # Check if image exists locally
         result = subprocess.run(
-            ["docker", "image", "inspect", image_name],
-            capture_output=True,
-            text=True
+            ["docker", "image", "inspect", image_name], capture_output=True, text=True
         )
-        
+
         if result.returncode == 0:
             console.print(f"[info]Docker image {image_name} is already present.[/info]")
             return
@@ -73,27 +88,31 @@ def ensure_docker_image(image_name: str):
             DownloadColumn(),
             TransferSpeedColumn(),
             TimeRemainingColumn(),
-            console=console
+            console=console,
         ) as progress:
-            task = progress.add_task(f"[cyan]Pulling Docker image {image_name}...", total=None)
-            
+            task = progress.add_task(
+                f"[cyan]Pulling Docker image {image_name}...", total=None
+            )
+
             process = subprocess.Popen(
                 ["docker", "pull", image_name],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                universal_newlines=True
+                universal_newlines=True,
             )
-            
+
             while True:
                 output = process.stdout.readline()
-                if output == '' and process.poll() is not None:
+                if output == "" and process.poll() is not None:
                     break
                 if output:
                     progress.update(task, description=f"[cyan]{output.strip()}")
-            
+
             if process.returncode == 0:
                 progress.update(task, completed=100)
-                console.print(f"[success]Successfully pulled Docker image {image_name}[/success]")
+                console.print(
+                    f"[success]Successfully pulled Docker image {image_name}[/success]"
+                )
             else:
                 error = process.stderr.read()
                 console.print(f"[error]Failed to pull Docker image: {error}[/error]")
@@ -101,6 +120,7 @@ def ensure_docker_image(image_name: str):
     except subprocess.CalledProcessError as e:
         console.print(f"[error]Error with Docker: {e}[/error]")
         raise typer.Exit(1)
+
 
 @app.command()
 def init():
@@ -111,14 +131,17 @@ def init():
             config = load_config()
             ensure_docker_image(config["docker_image"])
             create_aliases(config["aliases"])
-            console.print(Panel.fit(
-                "[success]managecor environment initialized successfully![/success]",
-                title="Success",
-                border_style="green"
-            ))
+            console.print(
+                Panel.fit(
+                    "[success]managecor environment initialized successfully![/success]",
+                    title="Success",
+                    border_style="green",
+                )
+            )
         except Exception as e:
             console.print(f"[error]Initialization failed: {str(e)}[/error]")
             raise typer.Exit(1)
+
 
 @app.command()
 def update_config():
@@ -135,14 +158,15 @@ def update_config():
         except requests.RequestException as e:
             console.print(f"[error]Failed to update configuration: {e}[/error]")
             raise typer.Exit(1)
-        
+
+
 @app.command()
 def update():
     """Force update the Docker image to the latest version."""
     try:
         config = load_config()
         image_name = config["docker_image"]
-        
+
         with console.status("[bold blue]Checking image status...") as status:
             # Get current image info before update
             current_info = get_image_info(image_name)
@@ -154,21 +178,24 @@ def update():
 
         # Force update the image
         updated, message = ensure_docker_image(image_name, force_update=True)
-        
+
         if updated:
             # Get new image info
             new_info = get_image_info(image_name)
             if new_info:
-                console.print(f"\n[success]Update successful! New image details:[/success]")
+                console.print(
+                    f"\n[success]Update successful! New image details:[/success]"
+                )
                 console.print(f"  ID: {new_info['id']}")
                 console.print(f"  Size: {new_info['size']}")
                 console.print(f"  Created: {new_info['created']}")
         else:
             console.print(f"\n[info]{message}[/info]")
-            
+
     except Exception as e:
         console.print(f"[error]Failed to update Docker image: {str(e)}[/error]")
         raise typer.Exit(1)
+
 
 @app.command()
 def run(command: List[str] = typer.Argument(...)):
@@ -180,6 +207,7 @@ def run(command: List[str] = typer.Argument(...)):
     except Exception as e:
         console.print(f"[error]Command execution failed: {str(e)}[/error]")
         raise typer.Exit(1)
+
 
 def create_aliases(aliases):
     """Create aliases for common commands, avoiding duplications."""
@@ -195,7 +223,7 @@ def create_aliases(aliases):
             else:
                 console.print(f"[warning]Unsupported shell: {shell}[/warning]")
                 return
-            
+
             rc_path = os.path.expanduser(rc_file)
 
             try:
@@ -213,18 +241,24 @@ def create_aliases(aliases):
             if new_aliases:
                 with open(rc_path, "a") as f:
                     f.writelines(new_aliases)
-                console.print(f"[success]Added {len(new_aliases)} new aliases to {rc_file}.[/success]")
+                console.print(
+                    f"[success]Added {len(new_aliases)} new aliases to {rc_file}.[/success]"
+                )
             else:
                 console.print("[info]No new aliases to add.[/info]")
 
-            console.print(f"[warning]Please restart your shell or run 'source {rc_file}' to apply changes.[/warning]")
+            console.print(
+                f"[warning]Please restart your shell or run 'source {rc_file}' to apply changes.[/warning]"
+            )
 
         elif system == "Windows":
             if not is_admin():
                 console.print(
                     "[warning]This script needs to be run with administrator privileges to modify the registry.[/warning]"
                 )
-                console.print("[info]Attempting to restart with admin privileges...[/info]")
+                console.print(
+                    "[info]Attempting to restart with admin privileges...[/info]"
+                )
                 run_as_admin()
                 return
 
@@ -266,6 +300,7 @@ def create_aliases(aliases):
 
         else:
             console.print(f"[error]Unsupported operating system: {system}[/error]")
+
 
 if __name__ == "__main__":
     app()
