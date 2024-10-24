@@ -8,18 +8,18 @@ from typing import List
 import requests
 import typer
 import yaml
+from rich import print as rprint
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import (
+    DownloadColumn,
     Progress,
     SpinnerColumn,
     TextColumn,
-    DownloadColumn,
-    TransferSpeedColumn,
     TimeRemainingColumn,
+    TransferSpeedColumn,
 )
 from rich.theme import Theme
-from rich import print as rprint
 
 from .docker_utils import run_docker_command
 
