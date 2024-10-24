@@ -1,74 +1,141 @@
-# managecor
+# ManageCor
 
-`managecor` est un outil en ligne de commande pour gérer et utiliser un environnement de développement Docker personnalisé basé sur Ubuntu Noble. Il inclut TeXLive 2023 (version complète sans documentation), Anaconda 2024.06, Git, Pandoc, FastAPI, ainsi que des packages LaTeX et des modèles Pandoc, dont eisvogel.latex.
+![PyPI Version](https://img.shields.io/pypi/v/managecor)
+![Python Version](https://img.shields.io/pypi/pyversions/managecor)
+![License](https://img.shields.io/github/license/infocornouaille/managecor)
+![Docker Pulls](https://img.shields.io/docker/pulls/infocornouaille/tools)
+![Docker Image Size](https://img.shields.io/docker/image-size/infocornouaille/tools)
+![PyPI Downloads](https://img.shields.io/pypi/dm/managecor)
+![GitHub last commit](https://img.shields.io/github/last-commit/infocornouaille/managecor)
+
+A command-line tool for managing and using a customized Docker development environment based on Texlive. It includes Python, Pandoc, along with LaTeX packages and Pandoc templates, including eisvogel.latex.
+
+## Features
+
+- 🐳 Docker-based isolated environment
+- 📦 Pre-configured TeXLive installation
+- 🐍 Python with essential development tools
+- 📄 Pandoc with custom templates
+- 🎨 ImageMagick support
+- 🔄 Automatic updates and configuration
+- ⚡ Convenient command aliases
+
+## Prerequisites
+
+- Docker installed on your system
+- Python 3.8 or higher
+- pip package manager
 
 ## Installation
 
-1. Assurez-vous d'avoir Docker installé sur votre système.
-2. Installez `managecor` via pip :
+Install `managecor` using pip:
 
-   ```
-   pip install managecor
-   ```
-
-## Initialisation
-
-Pour initialiser l'environnement `managecor`, exécutez :
-
+```bash
+pip install managecor
 ```
+
+## Quick Start
+
+1. Initialize the environment:
+```bash
 managecor init
 ```
 
-Cette commande va :
-- Mettre à jour la configuration depuis GitHub
-- S'assurer que l'image Docker est disponible localement
-- Créer des alias pour les commandes courantes
+This will:
+- Update configuration from GitHub
+- Pull required Docker images
+- Set up command aliases
 
-## Utilisation
-
-### Exécuter une commande dans le conteneur Docker
-
-```
-managecor run -- <commande>
+2. Use the provided aliases:
+```bash
+pythoncor script.py    # Run Python
+pandoccor input.md -o output.pdf    # Convert documents
 ```
 
-Par exemple :
-```
-managecor run -- python script.py
-```
+## Commands
 
-### Alias disponibles
+| Command | Description |
+|---------|-------------|
+| `managecor init` | Initialize the environment |
+| `managecor update` | Force update Docker images to latest version |
+| `managecor update-config` | Update configuration from GitHub |
+| `managecor run -- <command>` | Run a command in the Docker container |
 
-Après l'initialisation, les alias suivants seront disponibles dans votre shell :
+## Available Aliases
 
-- `pythoncor` : Python
-- `xelatexcor` : XeLaTeX
-- `pandoccor` : Pandoc
-- `latexcor` : LaTeX personnalisé
-- `latextomd` : Conversion LaTeX vers Markdown
-- `pdfcor` : Manipulation PDF
-- `jupytercor` : Manipulation Jupyter personnalisée
-- `black` : Formateur de code Python
-- `magick` : ImageMagick
+After initialization, the following aliases will be available in your shell:
 
-Utilisez ces alias comme des commandes normales, par exemple :
+| Alias | Description |
+|-------|-------------|
+| `pythoncor` | Python environment |
+| `xelatexcor` | XeLaTeX compiler |
+| `pandoccor` | Pandoc document converter |
+| `latexcor` | Custom LaTeX environment |
+| `latextomd` | Convert LaTeX to Markdown |
+| `pdfcor` | PDF manipulation tools |
+| `jupytercor` | Custom Jupyter environment |
+| `black` | Python code formatter |
+| `magick` | ImageMagick |
 
-```
+## Usage Examples
+
+Run Python script:
+```bash
 pythoncor script.py
 ```
 
-### Mise à jour de la configuration
-
-Pour mettre à jour la configuration depuis GitHub :
-
+Convert Markdown to PDF:
+```bash
+pandoccor input.md -o output.pdf
 ```
-managecor update-config
+
+Format Python code:
+```bash
+black script.py
 ```
 
 ## Configuration
 
-La configuration est stockée dans `~/.managecor_config.yaml`. Elle est automatiquement mise à jour lors de l'initialisation ou via la commande `update-config`.
+The configuration file is stored at `~/.managecor_config.yaml`. It's automatically updated during initialization or via the `update-config` command.
 
-## Licence
+## Docker Images
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+ManageCor uses two Docker images:
+
+- Base image (`infocornouaille/tools:base`): Contains core tools and dependencies
+- Custom image (`infocornouaille/tools:perso`): Includes additional templates and configurations
+
+To force update the Docker images to their latest versions:
+```bash
+managecor update
+```
+
+## Development
+
+To contribute to ManageCor:
+
+1. Fork the repository
+2. Create a feature branch
+3. Submit a Pull Request
+
+## Troubleshooting
+
+Common issues and solutions:
+
+- If aliases aren't working, try restarting your terminal or running:
+  ```bash
+  source ~/.bashrc  # for bash
+  source ~/.zshrc   # for zsh
+  ```
+- For Docker-related issues, ensure Docker daemon is running
+- For permission issues on Linux, ensure your user is in the docker group
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- TeXLive team for the base Docker image
+- Pandoc team for document conversion tools
+- All contributors to the project
