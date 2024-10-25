@@ -123,27 +123,25 @@ def run_docker_command(command: List[str], image_name: str):
         image_name,
     ] + command
 
-    with console.status(
-        f"[info]Running command in container: {' '.join(command)}[/info]"
-    ) as status:
-        try:
-            process = subprocess.run(full_command, text=True, capture_output=True)
+    console.status(f"[info]Running command in container: {' '.join(command)}[/info]")
+    try:
+        process = subprocess.run(full_command, text=True, capture_output=True)
 
-            if process.returncode == 0:
-                if process.stdout:
-                    console.print(process.stdout)
-                console.print("[success]Command completed successfully![/success]")
-            else:
-                if process.stderr:
-                    console.print(f"[error]Error output:[/error]\n{process.stderr}")
-                console.print(
-                    f"[error]Command failed with return code {process.returncode}[/error]"
-                )
+        if process.returncode == 0:
+            if process.stdout:
+                console.print(process.stdout)
+            console.print("[success]Command completed successfully![/success]")
+        else:
+            if process.stderr:
+                console.print(f"[error]Error output:[/error]\n{process.stderr}")
+            console.print(
+                f"[error]Command failed with return code {process.returncode}[/error]"
+            )
 
-        except subprocess.CalledProcessError as e:
-            console.print(f"[error]Failed to execute command: {str(e)}[/error]")
-        except Exception as e:
-            console.print(f"[error]Unexpected error: {str(e)}[/error]")
+    except subprocess.CalledProcessError as e:
+        console.print(f"[error]Failed to execute command: {str(e)}[/error]")
+    except Exception as e:
+        console.print(f"[error]Unexpected error: {str(e)}[/error]")
 
 
 def format_size(size: int) -> str:
