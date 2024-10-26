@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "managecor"
-version = "0.2.4"
+version = "0.3.1"
 description = ""
 authors = ["infocornouaille <90894019+infocornouaille@users.noreply.github.com>"]
 readme = "README.md"
