@@ -39,7 +39,7 @@ console = Console(
 CONFIG_URL = (
     "https://raw.githubusercontent.com/infocornouaille/managecor/main/config.yaml"
 )
-CONFIG_PATH = os.path.expanduser("~/.managecor_config.yaml")
+CONFIG_PATH = os.path.expanduser("../managecor_config.yaml")
 
 
 def get_image_info(image_name: str):
